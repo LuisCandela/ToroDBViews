@@ -1,0 +1,135 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.torodb</groupId>
+		<artifactId>torodb-parent</artifactId>
+		<version>0.23-SNAPSHOT</version>
+	</parent>
+
+	<groupId>com.toroDB</groupId>
+	<artifactId>ToroDBViews</artifactId>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<xmlOutput>true</xmlOutput>
+					<findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>analyze-compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-meta</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>annotations</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+		</dependency>
+		<!-- TODO Review ToroDependencies to see if any can be erased -->
+
+		<!-- <dependency> -->
+		<!-- <groupId>com.8kdata.mongowp</groupId> -->
+		<!-- <artifactId>mongo-server</artifactId> -->
+		<!-- <version>0.15</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.torodb.torod</groupId> -->
+		<!-- <artifactId>connection</artifactId> -->
+		<!-- <version>${torod.version}</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.torodb.torod</groupId> -->
+		<!-- <artifactId>d2r</artifactId> -->
+		<!-- <version>${torod.version}</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>com.torodb.torod.db-wrappers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${torod.version}</version>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>com.torodb.torod</groupId> -->
+		<!-- <artifactId>db-executor</artifactId> -->
+		<!-- <version>${torod.version}</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.torodb.torod</groupId> -->
+		<!-- <artifactId>db-meta-inf</artifactId> -->
+		<!-- <version>${torod.version}</version> -->
+		<!-- </dependency> -->
+		<dependency>
+			<groupId>com.torodb.torod</groupId>
+			<artifactId>torod-core</artifactId>
+			<version>${torod.version}</version>
+		</dependency>
+		<!-- <dependency> -->
+		<!-- <groupId>com.torodb.torod</groupId> -->
+		<!-- <artifactId>backend</artifactId> -->
+		<!-- <version>${torod.version}</version> -->
+		<!-- </dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>com.torodb.kvdocument</groupId> -->
+		<!-- <artifactId>mongo-converter</artifactId> -->
+		<!-- <version>${project.version}</version> -->
+		<!-- </dependency> -->
+	</dependencies>
+</project>
