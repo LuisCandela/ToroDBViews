@@ -10,6 +10,8 @@
 
 	<groupId>com.toroDB</groupId>
 	<artifactId>ToroDBViews</artifactId>
+	<packaging>jar</packaging>
+
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
@@ -44,7 +46,12 @@
 		</plugins>
 	</build>
 	<dependencies>
-		
+
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -84,52 +91,18 @@
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.json</artifactId>
 		</dependency>
-		<!-- TODO Review ToroDependencies to see if any can be erased -->
 
-		<!-- <dependency> -->
-		<!-- <groupId>com.8kdata.mongowp</groupId> -->
-		<!-- <artifactId>mongo-server</artifactId> -->
-		<!-- <version>0.15</version> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.torodb.torod</groupId> -->
-		<!-- <artifactId>connection</artifactId> -->
-		<!-- <version>${torod.version}</version> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.torodb.torod</groupId> -->
-		<!-- <artifactId>d2r</artifactId> -->
-		<!-- <version>${torod.version}</version> -->
-		<!-- </dependency> -->
 		<dependency>
 			<groupId>com.torodb.torod.db-wrappers</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>${torod.version}</version>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>com.torodb.torod</groupId> -->
-		<!-- <artifactId>db-executor</artifactId> -->
-		<!-- <version>${torod.version}</version> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.torodb.torod</groupId> -->
-		<!-- <artifactId>db-meta-inf</artifactId> -->
-		<!-- <version>${torod.version}</version> -->
-		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>com.torodb.torod</groupId>
 			<artifactId>torod-core</artifactId>
 			<version>${torod.version}</version>
 		</dependency>
-		<!-- <dependency> -->
-		<!-- <groupId>com.torodb.torod</groupId> -->
-		<!-- <artifactId>backend</artifactId> -->
-		<!-- <version>${torod.version}</version> -->
-		<!-- </dependency> -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.torodb.kvdocument</groupId> -->
-		<!-- <artifactId>mongo-converter</artifactId> -->
-		<!-- <version>${project.version}</version> -->
-		<!-- </dependency> -->
+
 	</dependencies>
 </project>

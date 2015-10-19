@@ -2,31 +2,27 @@ package com.toroDBViews.structure;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.jooq.Condition;
 import org.jooq.CreateViewFinalStep;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Name;
-import org.jooq.Param;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.jooq.types.UInteger;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
-import com.toroDBViews.connection.PosgreSQLConnection;
+import com.toroDBViews.connection.PostgreSQLConnection;
 import com.toroDBViews.exceptions.InstanceOfArrayStructureException;
-import com.toroDBViews.exceptions.typeAttributeException;
+import com.toroDBViews.exceptions.TypeAttributeException;
 import com.torodb.torod.core.dbWrapper.exceptions.ImplementationDbException;
 import com.torodb.torod.core.language.AttributeReference;
 import com.torodb.torod.core.subdocument.BasicType;
@@ -38,19 +34,28 @@ import com.torodb.torod.db.postgresql.meta.CollectionSchema;
 import com.torodb.torod.db.postgresql.meta.TorodbMeta;
 import com.torodb.torod.db.postgresql.meta.tables.SubDocTable;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+@SuppressFBWarnings("UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR")
 public class TableCreator {
 
 	private Connection c;
-	private PosgreSQLConnection connection = new PosgreSQLConnection();
+	private PostgreSQLConnection connection;
 	private DSLContext dsl;
 	private TorodbMeta meta;
+
 	private ViewConsumer viewConsumer;
+	
+	public TableCreator(ViewConsumer viewConsumer, PostgreSQLConnection connection) throws ClassNotFoundException, ImplementationDbException {
+		this.viewConsumer = viewConsumer;
+		this.connection = connection;
+		
+	}
 
-	public void main(String databaseName) throws SQLException, IOException, InvalidDatabaseException,
-			ImplementationDbException, InstanceOfArrayStructureException, InstantiationException,
-			IllegalAccessException, ClassNotFoundException, typeAttributeException {
+	public void execute() throws SQLException, IOException, InvalidDatabaseException, ImplementationDbException,
+			InstanceOfArrayStructureException, InstantiationException, IllegalAccessException, ClassNotFoundException,
+			TypeAttributeException {
 
-		connection.initialize(databaseName);
 		meta = connection.getMeta();
 		dsl = connection.getDsl();
 
@@ -63,11 +68,11 @@ public class TableCreator {
 
 			analyzeCollection(colSchema, table);
 
-			dropViews(colSchema, table, databaseName);
+			dropViews(colSchema, table);
 
 			analyzeType(colSchema, table);
 
-			generateView(colSchema, table, databaseName);
+			generateView(colSchema, table);
 
 		}
 
@@ -84,16 +89,14 @@ public class TableCreator {
 
 	}
 
-	private void dropViews(CollectionSchema colSchema, Table<AttributeReference, Integer, DocStructure> table,
-			String databaseName) throws ClassNotFoundException, ImplementationDbException, SQLException {
-
-		c = connection.openConection(databaseName);
-		dsl = connection.getDsl();
-
+	private void dropViews(CollectionSchema colSchema, Table<AttributeReference, Integer, DocStructure> table)
+			throws ClassNotFoundException, ImplementationDbException, SQLException {
+		
+		c = connection.openConection();
 		for (AttributeReference attRef : table.rowKeySet()) {
 
 			String viewName = setViewName(attRef);
-			dsl.dropViewIfExists(DSL.name(colSchema.getName(), viewName)).execute();
+			viewConsumer.dropView(colSchema.getName(), viewName);
 
 			c.commit();
 
@@ -102,7 +105,7 @@ public class TableCreator {
 	}
 
 	private void analyzeType(CollectionSchema colSchema, Table<AttributeReference, Integer, DocStructure> table)
-			throws typeAttributeException {
+			throws TypeAttributeException {
 
 		for (AttributeReference attRef : table.rowKeySet()) {
 
@@ -129,7 +132,7 @@ public class TableCreator {
 									if (type3.equals(type4) || type3 == BasicType.NULL || type4 == BasicType.NULL) {
 
 									} else {
-										throw new typeAttributeException();
+										throw new TypeAttributeException();
 									}
 								}
 							}
@@ -141,11 +144,8 @@ public class TableCreator {
 		}
 	}
 
-	private void generateView(CollectionSchema colSchema, Table<AttributeReference, Integer, DocStructure> table,
-			String databaseName) throws ClassNotFoundException, ImplementationDbException, SQLException {
-
-		c = connection.openConection(databaseName);
-		dsl = connection.getDsl();
+	private void generateView(CollectionSchema colSchema, Table<AttributeReference, Integer, DocStructure> table)
+			throws ClassNotFoundException, ImplementationDbException, SQLException {
 
 		String schemaName = colSchema.getName();
 		org.jooq.Table<?> rootTable = DSL.table(DSL.name(schemaName, "root"));
@@ -162,8 +162,7 @@ public class TableCreator {
 				SubDocType type = docStructure.getType();
 				SubDocTable subDocTable = colSchema.getSubDocTable(type);
 
-				Set<Field<?>> fields = Sets.newHashSetWithExpectedSize(column.size());
-				fields = addNullFields(column, subDocTable);
+				Set<Field<?>> fields = addNullFields(column, subDocTable);
 
 				org.jooq.Table<?> joinTable = subDocTable.join(rootTable)
 						.on(subDocTable.getDidColumn().eq(rootDidField));
@@ -175,21 +174,12 @@ public class TableCreator {
 			String viewName = setViewName(attRef);
 
 			Name[] columnNames = setColumName(column);
-			
-			CreateViewFinalStep view = dsl.createView(DSL.name(schemaName, viewName), columnNames).as(query);
-			
-			viewConsumer.consume(viewName, view);
-			
-//			String sql = dsl.createView(DSL.name(schemaName, viewName), columnNames).as(query).toString();
-//
-//			PreparedStatement statement = c.prepareStatement(sql);
-//
-//			statement.execute();
-//
-			c.commit();
 
+			CreateViewFinalStep view = dsl.createView(DSL.name(schemaName, viewName), columnNames).as(query);
+
+			viewConsumer.createView(schemaName, viewName, view);
 		}
-		connection.closeConection();
+
 	}
 
 	private Select createQuery(Select query, Set<Field<?>> fields, org.jooq.Table<?> joinTable,
@@ -197,21 +187,22 @@ public class TableCreator {
 			Map.Entry<Integer, DocStructure> entry) {
 
 		Condition indexCondition;
-		
+
 		if (docStructure.getIndex() == 0) {
 			indexCondition = subDocTable.getIndexColumn().isNull();
 		} else {
 			indexCondition = subDocTable.getIndexColumn().eq(docStructure.getIndex());
 		}
-		
-		Select subQuery = dsl.select(fields).from(joinTable).where(rootSidField.eq(DSL.val(entry.getKey()).cast(Integer.class)).and(indexCondition));
-		
+
+		Select subQuery = dsl.select(fields).from(joinTable)
+				.where(rootSidField.eq(DSL.val(entry.getKey()).cast(Integer.class)).and(indexCondition));
+
 		if (query == null) {
 			query = subQuery;
 		} else {
 			query = query.unionAll(subQuery);
 		}
-		
+
 		return query;
 	}
 
@@ -286,7 +277,7 @@ public class TableCreator {
 			} else {
 
 				fields.add(DSL.castNull(column.getDataType()).as(column));
-				
+
 			}
 		}
 

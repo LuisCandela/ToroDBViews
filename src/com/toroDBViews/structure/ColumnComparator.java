@@ -1,9 +1,15 @@
 package com.toroDBViews.structure;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class ColumnComparator implements Comparator<String> {
+public class ColumnComparator implements Comparator<String>, Serializable {
 	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public int compare(String field1, String field2) {

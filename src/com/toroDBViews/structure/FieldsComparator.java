@@ -1,11 +1,17 @@
 package com.toroDBViews.structure;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import org.jooq.Field;
 
-public class FieldsComparator implements Comparator<Field> {
+public class FieldsComparator implements Comparator<Field>, Serializable {
 	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public int compare(Field field1, Field field2) {
